@@ -1,0 +1,132 @@
+-- CustomDiscordLib: Modern ve Özelleştirilebilir Discord Tarzı UI Kütüphanesi
+
+local CustomDiscordLib = {}
+CustomDiscordLib.__index = CustomDiscordLib
+
+-- Pencere oluşturma fonksiyonu
+function CustomDiscordLib:CreateWindow(title)
+    local Window = {}
+    setmetatable(Window, CustomDiscordLib)
+
+    Window.Title = title or "New Window"
+    Window.Tabs = {}
+    
+    -- Ekran GUI'si
+    Window.ScreenGui = Instance.new("ScreenGui")
+    Window.ScreenGui.Parent = game.CoreGui
+
+    -- Ana pencere çerçevesi
+    Window.MainFrame = Instance.new("Frame")
+    Window.MainFrame.Parent = Window.ScreenGui
+    Window.MainFrame.Size = UDim2.new(0, 600, 0, 400)
+    Window.MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+    Window.MainFrame.BackgroundColor3 = Color3.fromRGB(44, 47, 51)
+    Window.MainFrame.BorderSizePixel = 0
+
+    -- Pencere başlığı
+    Window.TitleBar = Instance.new("Frame")
+    Window.TitleBar.Parent = Window.MainFrame
+    Window.TitleBar.Size = UDim2.new(1, 0, 0, 30)
+    Window.TitleBar.BackgroundColor3 = Color3.fromRGB(35, 39, 42)
+    Window.TitleBar.BorderSizePixel = 0
+
+    -- Başlık metni
+    Window.TitleLabel = Instance.new("TextLabel")
+    Window.TitleLabel.Parent = Window.TitleBar
+    Window.TitleLabel.Size = UDim2.new(1, 0, 1, 0)
+    Window.TitleLabel.Text = Window.Title
+    Window.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Window.TitleLabel.TextSize = 16
+    Window.TitleLabel.Font = Enum.Font.GothamBold
+    Window.TitleLabel.BackgroundTransparency = 1
+
+    -- Pencere kapatma butonu
+    Window.CloseButton = Instance.new("TextButton")
+    Window.CloseButton.Parent = Window.TitleBar
+    Window.CloseButton.Size = UDim2.new(0, 30, 1, 0)
+    Window.CloseButton.Position = UDim2.new(1, -30, 0, 0)
+    Window.CloseButton.Text = "X"
+    Window.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Window.CloseButton.BackgroundColor3 = Color3.fromRGB(194, 57, 52)
+    Window.CloseButton.BorderSizePixel = 0
+    Window.CloseButton.Font = Enum.Font.GothamBold
+    Window.CloseButton.TextSize = 16
+
+    Window.CloseButton.MouseButton1Click:Connect(function()
+        Window.ScreenGui:Destroy()
+    end)
+
+    -- Sekme butonlarını tutan çerçeve
+    Window.TabFrame = Instance.new("Frame")
+    Window.TabFrame.Parent = Window.MainFrame
+    Window.TabFrame.Size = UDim2.new(0, 150, 1, -30)
+    Window.TabFrame.Position = UDim2.new(0, 0, 0, 30)
+    Window.TabFrame.BackgroundColor3 = Color3.fromRGB(47, 49, 54)
+    Window.TabFrame.BorderSizePixel = 0
+
+    -- Tab içeriklerini tutan çerçeve
+    Window.ContentFrame = Instance.new("Frame")
+    Window.ContentFrame.Parent = Window.MainFrame
+    Window.ContentFrame.Size = UDim2.new(1, -150, 1, -30)
+    Window.ContentFrame.Position = UDim2.new(0, 150, 0, 30)
+    Window.ContentFrame.BackgroundColor3 = Color3.fromRGB(54, 57, 63)
+    Window.ContentFrame.BorderSizePixel = 0
+    
+    return Window
+end
+
+-- Sekme ekleme fonksiyonu
+function CustomDiscordLib:AddTab(tabName)
+    local Tab = {}
+    Tab.Title = tabName or "New Tab"
+    Tab.Buttons = {}
+
+    -- Sekme butonu
+    local TabButton = Instance.new("TextButton")
+    TabButton.Parent = self.TabFrame
+    TabButton.Size = UDim2.new(1, 0, 0, 30)
+    TabButton.Position = UDim2.new(0, 0, 0, (#self.Tabs * 30))
+    TabButton.Text = Tab.Title
+    TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TabButton.BackgroundColor3 = Color3.fromRGB(47, 49, 54)
+    TabButton.BorderSizePixel = 0
+    TabButton.Font = Enum.Font.GothamBold
+    TabButton.TextSize = 14
+
+    -- Tab içeriği
+    Tab.Content = Instance.new("Frame")
+    Tab.Content.Parent = self.ContentFrame
+    Tab.Content.Size = UDim2.new(1, 0, 1, 0)
+    Tab.Content.BackgroundTransparency = 1
+    Tab.Content.Visible = false
+
+    TabButton.MouseButton1Click:Connect(function()
+        for _, t in pairs(self.Tabs) do
+            t.Content.Visible = false
+        end
+        Tab.Content.Visible = true
+    end)
+
+    table.insert(self.Tabs, Tab)
+    return Tab
+end
+
+-- Buton ekleme fonksiyonu
+function CustomDiscordLib:AddButton(tab, buttonTitle, callback)
+    local Button = Instance.new("TextButton")
+    Button.Parent = tab.Content
+    Button.Size = UDim2.new(0, 200, 0, 30)
+    Button.Position = UDim2.new(0, 20, 0, (#tab.Buttons * 40) + 20)
+    Button.Text = buttonTitle
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.BackgroundColor3 = Color3.fromRGB(47, 49, 54)
+    Button.BorderSizePixel = 0
+    Button.Font = Enum.Font.Gotham
+    Button.TextSize = 14
+
+    Button.MouseButton1Click:Connect(callback)
+
+    table.insert(tab.Buttons, Button)
+end
+
+return CustomDiscordLib
